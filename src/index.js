@@ -1,6 +1,6 @@
 const moment = require('moment');
 const SHOP_SCHEDULE = require('./schedule');
-const { findDiffInHours, findNextOpenDay } = require('./utils');
+const { findDiffInHours, findNextOpenDay, generateDurationMessage } = require('./utils');
 
 const timeFormat = 'hh:mm A';
 const now = moment();
@@ -10,14 +10,14 @@ let day = SHOP_SCHEDULE.find(day => day.day === today);
 let statusMessage = {
     status: null,
     conjunction: null,
-    hours: null
+    duration: null
 };
 
 if (!day) {
     const hours = findDiffInHours(findNextOpenDay(now), now);
     statusMessage.status = 'CLOSED';
     statusMessage.conjunction = 'open after';
-    statusMessage.hours = hours;
+    statusMessage.duration = generateDurationMessage(hours);
 } else {
     day.open = moment(day.open, timeFormat);
     day.close = moment(day.close, timeFormat);
@@ -38,7 +38,7 @@ if (!day) {
         statusMessage.status = 'CLOSED';
         statusMessage.conjunction = 'open after';
     }
-    statusMessage.hours = hours;
+    statusMessage.duration = generateDurationMessage(hours);
 }
 
-console.log(`${statusMessage.status}. The shop will ${statusMessage.conjunction} ${statusMessage.hours} Hr${statusMessage.hours === 1 ? '' : 's'}.`);
+console.log(`${statusMessage.status}. The shop will ${statusMessage.conjunction} ${statusMessage.duration}.`);
